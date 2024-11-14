@@ -1,0 +1,10 @@
+{
+  "name": "silentwarble",
+  "short_name": "silentwarble",
+  "description": "Security Research",
+  "icons": [],
+  "start_url": "/index.html",
+  "theme_color": "#2a1e6b",
+  "background_color": "#ffffff",
+  "display": "fullscreen"
+}

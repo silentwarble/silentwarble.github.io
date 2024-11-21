@@ -47,14 +47,23 @@ Cheers to @its-a-feature!
 
 As you develop, remember these limitations:
 
-- No global variables
+- No global variables (Can use a stub like Stardust)
 - Everything must be in the .text section
-- Stack size is limited to 5k 
+- Single function stack frame is limited to 8k (64 bit) or 4k (32 bit) by [default](https://learn.microsoft.com/en-us/windows/win32/devnotes/-win32-chkstk)
 - No libc functions (such as malloc)
 
 If something works in the debug exe but not the PIC .bin, then you violated one of these rules. 
 
-The stack size one was particularly tricky. You can't exceed 5kb of data on the stack as it ends up clobbering return addresses. I am assuming this is due to us defining chkstk as just a return. See **stub_wrapper.asm** for more details. I am not 100% sure this is why, but it seems plausible. If that is not correct, please DM me so I can fix.
+I got some great feedback from [M_alphaaa](https://x.com/M_alphaaa) and [ilove2pwn_](https://x.com/ilove2pwn_) on a few points.
+
+- Stack size can be adjusted via the compiler
+- We can resolve the removal of chkstk with ```mno-stack-arg-probe```
+- We could re-implement chkstk as it is fairly simple. Hannibal takes the easy route of limiting function's stack frames to less than 4k and using the heap. I may change that in the future for fewer API calls.
+- https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-libraries/winpthreads/src/libgcc/dll_dependency.S
+- https://github.com/llvm/llvm-project/blob/main/compiler-rt/lib/builtins/x86_64/chkstk.S
+
+
+This how Hannibal currently handles chkstk:
 
 ```asm
 ;; If not in this section it points to a bunch of zeros and crashes.
